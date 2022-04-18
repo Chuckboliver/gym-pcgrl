@@ -5,6 +5,11 @@ import numpy as np
 import gym
 from gym import spaces
 import PIL
+import pygame
+
+VIEWPORT_W = 600
+VIEWPORT_H = 400
+
 
 """
 The PCGRL GYM Environment
@@ -13,7 +18,7 @@ class PcgrlEnv(gym.Env):
     """
     The type of supported rendering
     """
-    metadata = {'render.modes': ['human', 'rgb_array']}
+    metadata = {'render.modes': ['human', 'rgb_array'], 'render.fps': 2}
 
     """
     Constructor for the interface.
@@ -36,6 +41,8 @@ class PcgrlEnv(gym.Env):
 
         self.seed()
         self.viewer = None
+        self.isopen = True
+        self.clock = None
 
         self.action_space = self._rep.get_action_space(self._prob._width, self._prob._height, self.get_num_tiles())
         self.observation_space = self._rep.get_observation_space(self._prob._width, self._prob._height, self.get_num_tiles())
@@ -165,18 +172,30 @@ class PcgrlEnv(gym.Env):
         if mode == 'rgb_array':
             return img
         elif mode == 'human':
-            from gym.envs.classic_control import rendering
-            if self.viewer is None:
-                self.viewer = rendering.SimpleImageViewer()
-            if not hasattr(img, 'shape'):
-                img = np.array(img)
-            self.viewer.imshow(img)
-            return self.viewer.isopen
+            if not self.viewer:
+                pygame.init()
+                pygame.display.init()
+                self.viewer = pygame.display.set_mode((VIEWPORT_W, VIEWPORT_H))
+            if not self.clock:
+                self.clock = pygame.time.Clock()
+
+            img_mode = img.mode
+            img_size = img.size
+            data = img.tobytes()
+            img_surface = pygame.image.fromstring(data, img_size, img_mode)
+            rect = img_surface.get_rect()
+            rect.center = (VIEWPORT_W / 2, VIEWPORT_H / 2)
+            self.viewer.blit(img_surface, rect)
+            pygame.event.pump()
+            self.clock.tick(self.metadata["render.fps"])
+            pygame.display.flip()
+            return self.isopen
 
     """
     Close the environment
     """
     def close(self):
         if self.viewer:
-            self.viewer.close()
-            self.viewer = None
+            pygame.display.quit()
+            pygame.quit()
+            self.isopen = False
