@@ -2,7 +2,7 @@ import os
 import numpy as np
 from PIL import Image
 from gym_pcgrl.envs.probs.problem import Problem
-from gym_pcgrl.envs.helper import get_range_reward, get_tile_locations, calc_num_regions, calc_certain_tile, run_dikjstra
+from gym_pcgrl.envs.helper import get_range_reward, get_tile_locations, calc_num_regions, calc_certain_tile, run_dijkstra
 
 """
 Generate a fully connected GVGAI zelda level where the player can reach key then the door.
@@ -95,19 +95,19 @@ class ZeldaProblem(Problem):
             enemies.extend(map_locations["bat"])
             enemies.extend(map_locations["scorpion"])
             if len(enemies) > 0:
-                dikjstra,_ = run_dikjstra(p_x, p_y, map, ["empty", "player", "bat", "spider", "scorpion"])
+                dijkstra,_ = run_dijkstra(p_x, p_y, map, ["empty", "player", "bat", "spider", "scorpion"])
                 min_dist = self._width * self._height
                 for e_x,e_y in enemies:
-                    if dikjstra[e_y][e_x] > 0 and dikjstra[e_y][e_x] < min_dist:
-                        min_dist = dikjstra[e_y][e_x]
+                    if dijkstra[e_y][e_x] > 0 and dijkstra[e_y][e_x] < min_dist:
+                        min_dist = dijkstra[e_y][e_x]
                 map_stats["nearest-enemy"] = min_dist
             if map_stats["key"] == 1 and map_stats["door"] == 1:
                 k_x,k_y = map_locations["key"][0]
                 d_x,d_y = map_locations["door"][0]
-                dikjstra,_ = run_dikjstra(p_x, p_y, map, ["empty", "key", "player", "bat", "spider", "scorpion"])
-                map_stats["path-length"] += dikjstra[k_y][k_x]
-                dikjstra,_ = run_dikjstra(k_x, k_y, map, ["empty", "player", "key", "door", "bat", "spider", "scorpion"])
-                map_stats["path-length"] += dikjstra[d_y][d_x]
+                dijkstra,_ = run_dijkstra(p_x, p_y, map, ["empty", "key", "player", "bat", "spider", "scorpion"])
+                map_stats["path-length"] += dijkstra[k_y][k_x]
+                dijkstra,_ = run_dijkstra(k_x, k_y, map, ["empty", "player", "key", "door", "bat", "spider", "scorpion"])
+                map_stats["path-length"] += dijkstra[d_y][d_x]
 
         return map_stats
 
