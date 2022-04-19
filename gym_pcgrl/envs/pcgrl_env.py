@@ -18,7 +18,7 @@ class PcgrlEnv(gym.Env):
     """
     The type of supported rendering
     """
-    metadata = {'render.modes': ['human', 'rgb_array'], 'render.fps': 2}
+    metadata = {'render.modes': ['human', 'rgb_array'], 'render.fps': 5}
 
     """
     Constructor for the interface.
