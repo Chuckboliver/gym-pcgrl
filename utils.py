@@ -82,9 +82,9 @@ def max_exp_idx(exp_name):
     if len(log_files) == 0:
         n = 0
     else:
-        log_ns = [re.search('_(\d+)', f).group(1) for f in log_files]
+        log_ns = [int(re.search('_(\d+)', f).group(1)) for f in log_files]
         n = max(log_ns)
-    return int(n)
+    return n
 
 def load_model(log_dir):
     model_path = os.path.join(log_dir, 'latest_model.pkl')
