@@ -24,18 +24,20 @@ def infer(game, representation, model_path, **kwargs):
         kwargs['cropped_size'] = 10
     kwargs['render'] = True
 
+    print(model_path)
     agent = PPO2.load(model_path)
     env = make_vec_envs(env_name, representation, None, 1, **kwargs)
     obs = env.reset()
     obs = env.reset()
-    dones = False
     for i in range(kwargs.get('trials', 1)):
+        dones = False
         while not dones:
             action, _ = agent.predict(obs)
             obs, _, dones, info = env.step(action)
             if kwargs.get('verbose', False):
                 print(info[0])
             if dones:
+                print("Done")
                 break
         time.sleep(0.2)
 
@@ -43,8 +45,9 @@ def infer(game, representation, model_path, **kwargs):
 game = 'binary'
 representation = 'narrow'
 model_path = 'models/{}/{}/model_1.pkl'.format(game, representation)
+model_path = 'runs/binary_narrow_10_log/latest_model.pkl'
 kwargs = {
-    'change_percentage': 0.4,
+    'change_percentage': 1.0,
     'trials': 1,
     'verbose': True
 }

@@ -98,11 +98,11 @@ game = 'binary'
 representation = 'narrow'
 experiment = None
 steps = 1e8
-render = False
+render = False # Why this is not render?
 logging = True
-n_cpu = 50
+n_cpu = 1
 kwargs = {
-    'resume': False
+    'resume': True
 }
 
 if __name__ == '__main__':
